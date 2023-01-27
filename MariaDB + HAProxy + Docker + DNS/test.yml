@@ -1,0 +1,36 @@
+---
+- name: create nginx service
+  hosts: all
+  tasks:
+        - name: docker swarm init
+          shell: "docker swarm init --advertise-addr $(echo $(nslookup nginx-node1 | awk 'NR == 5' | cut -d : -f 2)) | grep 'docker swarm join --token' > /opt/token.txt"
+          when: ansible_host == "nginx-node1.server.local"
+          register: token_print
+
+        - debug:
+              var: token_print.stdout
+
+        - name: get token from nginx-node1
+          fetch:
+              src: "/opt/token.txt"
+              dest: "/opt/token.txt"
+              flat: true
+          when: ansible_host == "nginx-node1.server.local"
+
+        - name: copy token.txt to nginx-node2
+          copy:
+              src: "/opt/token.txt"
+              dest: "/opt/token.txt"
+          when: ansible_host == "nginx-node2.server.local"
+          register: copy_print
+
+        - debug:
+              var: copy_print.stdout
+
+        - name: add token to worker
+          shell: "$(cat /opt/token.txt)"
+          when: ansible_host == "nginx-node2.server.local"
+          register: worker_print
+
+        - debug:
+              var: worker_print.stdout 

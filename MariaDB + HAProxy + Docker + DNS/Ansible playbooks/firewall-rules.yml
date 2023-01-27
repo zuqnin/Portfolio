@@ -1,0 +1,41 @@
+---
+ - name: Firewalld rules
+   hosts: all
+   tasks:
+    - name: Firewalld rules
+      firewalld:
+        permanent: yes
+        immediate: yes
+        port: "{{item.port}}/{{item.proto}}"
+        state: "{{item.state}}"
+        zone: "{{item.zone}}"
+      with_items:
+       - {port: "3306", proto: "tcp", state: "enabled", zone: "public" }
+       - {port: "4567", proto: "tcp", state: "enabled", zone: "public" }
+       - {port: "4568", proto: "tcp", state: "enabled", zone: "public" }
+       - {port: "4444", proto: "tcp", state: "enabled", zone: "public" }
+       - {port: "4567", proto: "udp", state: "enabled", zone: "public" }
+
+    - name: mariadb
+      firewalld:
+              name: mysql
+              permanent: yes
+              immediate: yes
+              state: enabled
+
+    - name: dns rule
+      firewalld:
+              name: dns
+              permanent: yes
+              immediate: yes
+              state: enabled
+    
+    - name: dns port rule
+      firewalld:
+              port: 53
+              proto: udp
+              permanent: yes
+              immediate: yes
+              state: enabled
+
+

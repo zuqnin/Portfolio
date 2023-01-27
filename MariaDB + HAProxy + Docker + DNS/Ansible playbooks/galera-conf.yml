@@ -1,0 +1,33 @@
+---
+- name: copy configurations to nodes
+  hosts: clusters
+  tasks:
+        - name: copy master-node1.txt configuration to master node1
+          copy: 
+              src: "/opt/node-files/master-node1.txt"
+              dest: "/etc/my.cnf.d/galera.conf"
+          when: ansible_host == "node-1.server.local"
+
+        - name: copy node2.txt configuration to node2
+          copy:
+              src: "/opt/node-files/node2.txt"
+              dest: "/etc/my.cnf.d/galera.conf"
+          when: ansible_host == "node-2.server.local"
+
+        - name: set safe_to_bootstrap value to 1
+          lineinfile:
+                  path: /var/lib/mysql/grastate.dat
+                  regexp: "^safe_to_bootstrap"
+                  line: "safe_to_bootstrap: 1"
+          when: ansible_host == "node-1.server.local"
+
+        - name: create new galera cluster
+          command: "galera_new_cluster"
+          when: ansible_host == "node-1.server.local"
+
+        - name: restart mariadb service
+          service:
+                name: mariadb.service
+                state: restarted
+          when: ansible_host != "node-1.server.local"
+

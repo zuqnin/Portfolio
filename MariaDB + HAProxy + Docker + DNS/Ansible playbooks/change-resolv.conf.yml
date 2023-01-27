@@ -1,0 +1,12 @@
+---
+- name: change resolv.conf file
+  hosts: all
+  tasks:
+        - name: nameserver and domain
+          copy:
+              src: /opt/resolv.conf
+              dest: /etc/resolv.conf
+              owner: root
+              group: root
+              mode: "0644"
+              

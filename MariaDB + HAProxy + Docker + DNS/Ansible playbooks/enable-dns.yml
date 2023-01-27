@@ -1,0 +1,30 @@
+---
+- name: restart named on dns server
+  hosts: dns-server
+  tasks:
+    
+        - name: debug package
+          command: "rpm -q {{ item }}"
+          register: package_check
+          with_items:
+                   - bind
+                   - bind-utils
+
+        - name: print execution results
+          debug:
+               msg: "bind and bind-utils packages is installed"
+          when: package_check is succeeded
+
+        - name: copy files to dns server
+          copy: 
+              src: "{{ item.src }}"
+              dest: "{{ item.dest }}"
+          with_items:
+              - { src: '/opt/named.conf', dest: '/etc/named.conf' }
+              - { src: '/opt/server.local.db', dest: '/var/named/server.local.db' }
+              - { src: '/opt/reverse.zone.db', dest: '/var/named/reverse.zone.db' }
+
+        - name: start named service
+          service:
+                name: named
+                state: started

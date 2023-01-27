@@ -1,0 +1,74 @@
+---
+- name: clustering nginx nodes
+  hosts: all
+  tasks:
+        - name: start glusterd and glusterfsd service
+          service:
+                name: "{{ item }}"
+                state: started
+          with_items:
+                - glusterd
+                - glusterfsd
+
+        - name: gluster peer probe
+          command: "gluster peer probe nginx-node2"
+          when: ansible_host == "nginx-node1.server.local"
+          register: probe_status
+
+        - debug:
+              var: probe_status
+
+        - name: gluster peer status
+          command: "gluster peer status"
+          register: peer_status
+
+        - debug:
+              var: peer_status.stdout
+
+        - name: gluster create volume
+          command: "gluster volume create nginx-volume replica 2 nginx-node1:/opt/data/bricks/glusterfs nginx-node2:/opt/data/bricks/glusterfs force"
+          when: ansible_host == "nginx-node1.server.local"
+          register: replica_status
+
+        - debug:
+              var: replica_status
+
+        - name: gluster volume status
+          command: "gluster volume status"
+          when: ansible_host == "nginx-node1.server.local"
+          register: volume_status
+
+        - debug:
+              var: volume_status
+
+        - name: gluster start volume
+          command: "gluster volume start nginx-volume"
+          when: ansible_host == "nginx-node1.server.local"
+          register: startvol_status
+
+        - debug:
+              var: startvol_status
+
+        - name: /etc/fstab backup
+          copy:
+              src: /etc/fstab
+              dest: /etc/fstab.bkp
+
+        - name: create /mnt/gluster-dir
+          command: "mkdir -p /mnt/gluster-dir"
+          register: dir_status
+
+        - debug:
+              var: dir_status
+
+        - name: mount to directory and test
+          command: "{{ item }}"
+          register: gluster_dir
+          with_items:
+              - "mount.glusterfs nginx-node1:/nginx-volume /mnt/gluster-dir"
+              - "echo 'nginx-node1:/nginx-volume  /mnt/gluster-dir  glusterfs defaults 0 0' >> /etc/fstab"
+              - "mount -a"
+
+        - debug:
+              var: gluster_dir.stdout           
+        

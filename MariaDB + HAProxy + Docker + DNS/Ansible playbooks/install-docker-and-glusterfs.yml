@@ -1,0 +1,15 @@
+---
+- name: install docker and glusterfs
+  hosts: all
+  tasks:
+        - name: install docker
+          command: "dnf config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo"       
+
+        - name: install docker-ce, docker-ce-cli and containerd.io
+          yum:
+              name: "{{ item }}"
+              state: present
+          with_items:
+              - "docker-ce"
+              - "docker-ce-cli"
+              - "containerd.io"
