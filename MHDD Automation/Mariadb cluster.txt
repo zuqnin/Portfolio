@@ -1,0 +1,16 @@
+### in node-1 ###
+
+yum install mariadb-server-galera (install in each nodes)
+
+sudo yum install rsync policycoreutils-python (install in each nodes)
+
+### after installaion start and enable service only in node-1 ###
+
+systemctl start mariadb
+
+systemctl enable mariadb
+
+sudo galera_new_cluster
+
+
+

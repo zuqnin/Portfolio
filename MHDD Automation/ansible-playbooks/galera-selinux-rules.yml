@@ -1,0 +1,13 @@
+---
+- name: selinux rules for port
+  hosts: all
+  tasks:
+        - name: port rules
+          command: "{{ item }}"
+          with_items:
+                - "sudo semanage port -a -t mysqld_port_t -p tcp 4567"
+                - "sudo semanage port -a -t mysqld_port_t -p udp 4567"
+                - "sudo semanage port -a -t mysqld_port_t -p tcp 4568"
+                - "sudo semanage port -a -t mysqld_port_t -p tcp 4444"
+                - "sudo semanage permissive -a mysqld_t"
+ 

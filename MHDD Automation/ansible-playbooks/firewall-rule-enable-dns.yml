@@ -1,0 +1,19 @@
+---
+ - name: Firewalld rules
+   hosts: all
+   tasks:  
+        - name: dns port udp rule
+          firewalld:
+              port: 53
+              proto: udp
+              permanent: yes
+              immediate: yes
+              state: enabled
+    
+        - name: dns port tcp rule
+          firewalld:
+              port: 53
+              proto: tcp
+              permanent: yes
+              immediate: yes
+              state: enabled

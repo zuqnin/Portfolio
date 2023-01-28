@@ -1,0 +1,17 @@
+---
+- name: copy sql configurations to clusters
+  hosts: all
+  tasks:
+        - name: copy files
+          copy:
+              src: "{{ item.src }}"
+              dest: "{{ item.dest }}"
+          with-items:
+                  - { src: /opt/mhdd-automation/hosts/master-haproxy.sql, dest: /opt/master-haproxy.sql }
+                  - { src: /opt/mhdd-automation/hosts/second-haproxy.sql, dest: /opt/second-haproxy.sql }
+
+        - name: add to database
+          shell: "{{ item }}"
+          with_items:
+                  - "mysql -u root < master-haproxy.sql"
+                  - "mysql -u root < second-haproxy.sql"

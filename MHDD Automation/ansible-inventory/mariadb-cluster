@@ -1,0 +1,3 @@
+[clusters]
+node1  ansible_host = node1.server.local
+node2  ansible_host = node2.server.local

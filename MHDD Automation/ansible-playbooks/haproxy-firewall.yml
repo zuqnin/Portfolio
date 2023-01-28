@@ -1,0 +1,20 @@
+---
+- name: firewall haproxy port
+  hosts: all
+  vars_files:
+      - /opt/node_vars.yml
+  tasks:
+        - name: open 3307 port
+          firewalld:
+                port: 3307/tcp
+                permanent: yes
+                immediate: yes
+                state: enabled
+
+        - name: add source haproxy-node1
+          shell: "firewall-cmd --add-source={{ haproxy_node1 }}; firewall-cmd --reload"
+          when: ansible_host == "haproxy-node2.server.local"
+
+        - name: add source haproxy-node2
+          shell: "firewall-cmd --add-source={{ haproxy_node2 }} --permanent; firewall-cmd --reload"
+          when: ansible_host == "haproxy-node1.server.local"

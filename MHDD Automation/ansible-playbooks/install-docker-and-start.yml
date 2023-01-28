@@ -1,0 +1,28 @@
+---
+- name: install docker
+  hosts: all
+  tasks:
+        - name: install docker
+          command: "dnf config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo"       
+
+        - name: install docker-ce, docker-ce-cli and containerd.io
+          yum:
+              name: "{{ item }}"
+              state: present
+          with_items:
+              - "docker-ce"
+              - "docker-ce-cli"
+              - "containerd.io"
+
+        - name: enable docker service
+          service:
+              name: docker
+              state: started
+
+        - name: docker pull image
+          command: "docker pull haproxytech/haproxy-alpine"
+
+        - name: create db_proxy 
+          command: "docker run -it --name db_proxy --network host -v /tmp/haproxy/:/usr/local/etc/haproxy/ -d haproxytech/haproxy-alpine"
+          when: ansible_host == "haproxy-node1.server.local""
+          

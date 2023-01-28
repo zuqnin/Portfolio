@@ -1,0 +1,14 @@
+---
+- name: copy haproxy configurations
+  hosts: all
+  tasks:
+        - name: create /tmp/haproxy directory
+          file:
+              path: /tmp/haproxy
+              state: directory
+
+        - name: copy files
+          copy:
+              src: "/opt/master-haproxy.cfg"
+              dest: "/tmp/haproxy/haproxy.cfg"
+
