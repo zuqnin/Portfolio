@@ -1,8 +1,0 @@
----
-- name: enable dockers
-  hosts: all
-  tasks:
-      - name: enable docker service
-        service:
-              name: docker
-              state: started

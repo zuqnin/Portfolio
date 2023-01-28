@@ -1,3 +1,0 @@
-[haproxy-nodes]
-haproxy-node1  ansible_host=haproxy-node1.server.local
-haproxy-node2  ansible_host=haproxy-node2.server.local
